@@ -31,8 +31,8 @@ class InputViewController: UIViewController {
         titleTextField.text = task.title
         contentsTextView.text = task.contents
         datePicker.date = task.date
-        //課題の追加
-        //categoryText.text = task.category
+        //課題のコード
+        categoryText.text = task.category
         //ここまで
     }
     //入力画面から戻ってきた時に TableView を更新させる
@@ -41,8 +41,8 @@ class InputViewController: UIViewController {
             self.task.title = self.titleTextField.text!
             self.task.contents = self.contentsTextView.text
             self.task.date = self.datePicker.date
-            //課題のcategoryを更新させる
-            //self.task.category = self.categoryText.text!
+            //課題のコード
+            self.task.category = self.categoryText.text!
             //ここまで
             self.realm.add(self.task, update: true)
         }

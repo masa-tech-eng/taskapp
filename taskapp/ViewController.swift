@@ -23,19 +23,27 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     // 日付近い順\順でソート：降順
     // 以降内容をアップデートするとリスト内は自動的に更新される。
     var taskArray = try! Realm().objects(Task.self).sorted(byKeyPath: "date", ascending: false)
-   
-    
-    //課題　　検索条件: Taskクラスの中でcategoryがsearchBarに入力された値と同じもの
-    //var searchArray = try! Realm().objects(Task.self).filter("category = ' ここに入力 '")
-     //このRealmはクラスのりRealmだから、メソッドの中で使う。検索した時に発動するメソッド。
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         tableView.delegate = self
         tableView.dataSource = self
+        searchBar.delegate = self
+        searchBar.showsCancelButton = true
 
-    }    
+    }
+    //検索ボタン押したときの機能。
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        taskArray = try! Realm().objects(Task.self).filter("category = %@", searchBar.text!).sorted(byKeyPath: "date", ascending: false)
+        tableView.reloadData()
+    }
+    //Cancelボタン押された時の機能
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        taskArray = realm.objects(Task.self).sorted(byKeyPath: "date", ascending: false)
+        tableView.reloadData()
+    }
+    
     // segue で画面遷移する時に呼ばれる
     override func prepare(for segue: UIStoryboardSegue, sender: Any?){
         let inputViewController:InputViewController = segue.destination as! InputViewController
@@ -80,7 +88,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         let dateString:String = formatter.string(from: task.date)
         cell.detailTextLabel?.text = dateString
         
-        
         return cell
     }
     
@@ -104,7 +111,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             // ローカル通知をキャンセルする
             let center = UNUserNotificationCenter.current()
             center.removePendingNotificationRequests(withIdentifiers: [String(task.id)])
-            
+
             // データベースから削除する
             try! realm.write {
                 self.realm.delete(task)
